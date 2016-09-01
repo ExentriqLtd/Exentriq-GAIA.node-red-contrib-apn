@@ -1,5 +1,4 @@
 # Exentriq-GAIA.node-red-contrib-apn
-
 Apple Push Notification node
 
 ## How to create certificates
