@@ -1,5 +1,5 @@
 # Exentriq-GAIA.node-red-contrib-apn
-Apple Push Notification node
+Apple Push Notification node for Node-RED based on argon/node-apn
 
 ## How to create certificates
 ### Production certificates
