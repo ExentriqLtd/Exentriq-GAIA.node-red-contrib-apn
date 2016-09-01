@@ -1,5 +1,7 @@
 # Exentriq-GAIA.node-red-contrib-apn
 
+Apple Push Notification node
+
 ## How to create certificates
 ### Production certificates
 openssl x509 -in aps_development.cer -inform DER -outform PEM -out cert.pem
