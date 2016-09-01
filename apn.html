@@ -1,0 +1,42 @@
+<script type="text/javascript">
+    RED.nodes.registerType('apn',{
+        category: 'function',
+        color: '#FFAAAA',
+        defaults: {
+            name: {value:""},
+            path: {required:true},
+            destination: {required:true, value:"Production"}
+        },
+        inputs:1,
+        outputs:0,
+        icon: "apple.png",
+        label: function() {
+            return this.name||"apn";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="apn">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+	<div class="form-row">
+        <label for="node-input-path"><i class="fa fa-folder"></i> Path</label>
+        <input type="text" id="node-input-path" placeholder="certificate path">
+    </div>
+	<div class="form-row">
+        <label for="node-input-destination"><i class="fa fa-folder"></i> Destination</label>
+		<select id="node-input-destination">
+			<option value="Production">Production</option>
+			<option value="Sandbox">Sandbox</option>
+		</select>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="apn">
+    <p>A node for interfacing with the Apple Push Notification service.</p>
+    <p><b>Path</b>  <i>The path containing the certificate and the key.</i></p>
+    <p>The certificate file must be named <i>cert.pem</i> and the key file <i>key.pem</i>.</p>
+	<p>In order to set the badge number use the variable <i>msg.badge.</i></p>
+</script>
