@@ -1,5 +1,5 @@
 module.exports = function(RED) {
-	
+
     function Apn(config) {
         RED.nodes.createNode(this,config);
         var node = this;
@@ -9,15 +9,15 @@ module.exports = function(RED) {
 
         try {
         	this.on('input', function(msg) {
-            
+
         		var path = config.path;
                 if( path.substr(-1) != "/" ) {
                 	path += "/";
                 }
-                
+
                 var certificate = path+'cert.pem';
                 var key = path+'key.pem';
-                
+
                 if(!fs.existsSync(certificate)) {
                 	node.error("File not found: " + certificate, msg);
                 	return;
@@ -26,9 +26,9 @@ module.exports = function(RED) {
                 	node.error("File not found: " + key, msg);
                 	return;
             	}
-                
+
                 var production = true;
-                if (config.hasOwnProperty('destination')) { 
+                if (config.hasOwnProperty('destination')) {
                 	if(config.destination == 'Production'){
                 		production = true;
                 	}
@@ -36,9 +36,9 @@ module.exports = function(RED) {
                 		production = false;
                 	}
                 }
-                
+
                 node.log("Production: " + production);
-                
+
                 var options = {'cert':certificate, 'key':key, 'production':production };
 
         	var apnConnection = new apn.Connection(options);
@@ -54,9 +54,12 @@ module.exports = function(RED) {
                 else{
                 	note.payload = {'messageFrom': 'Exentriq'};
                 }
+								if(msg.notificationTopic){
+									note.topic = msg.notificationTopic;
+								}
                 note.sound = "ping.aiff";
                 note.alert = msg.payload;
-                
+
 
                 var regTokens = [];
                 if(util.isArray(msg.topic)){
@@ -74,7 +77,7 @@ module.exports = function(RED) {
 					} catch (e) {
 						node.error("Errore during notification sent", e);
 					}
-                	
+
                 }
                 apnConnection.shutdown();
                 //node.status({});
@@ -84,6 +87,6 @@ module.exports = function(RED) {
     		node.error("ops, there was an error!", msg);
         }
     }
-    
+
     RED.nodes.registerType("apn",Apn);
 }
