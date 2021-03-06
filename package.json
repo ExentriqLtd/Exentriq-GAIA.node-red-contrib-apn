@@ -1,13 +1,13 @@
 {
     "name": "node-red-contrib-apn",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "description": "Apple Push Notification node",
     "author": "Calogero Crapanzano <calosan@libero.it>",
     "keywords": [
         "node-red"
     ],
     "dependencies": {
-        "apn": "1.7.5"
+        "apn": "2.2.0"
     },
     "node-red": {
         "nodes": {

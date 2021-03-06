@@ -10,77 +10,84 @@ module.exports = function(RED) {
         try {
         	this.on('input', function(msg) {
 
-        		var path = config.path;
-                if( path.substr(-1) != "/" ) {
-                	path += "/";
-                }
+            var path = config.path;
+            if( path.substr(-1) != "/" ) {
+                path += "/";
+            }
 
-                var certificate = path+'cert.pem';
-                var key = path+'key.pem';
+            var certificate = path+'cert.pem';
+            var key = path+'key.pem';
 
-                if(!fs.existsSync(certificate)) {
-                	node.error("File not found: " + certificate, msg);
-                	return;
-            	}
-                if(!fs.existsSync(key)) {
-                	node.error("File not found: " + key, msg);
-                	return;
-            	}
+            if(!fs.existsSync(certificate)) {
+                node.error("File not found: " + certificate, msg);
+                return;
+            }
+            if(!fs.existsSync(key)) {
+                node.error("File not found: " + key, msg);
+                return;
+            }
 
-                var production = true;
-                if (config.hasOwnProperty('destination')) {
-                	if(config.destination == 'Production'){
-                		production = true;
-                	}
-                	else{
-                		production = false;
-                	}
-                }
-
-                node.log("Production: " + production);
-
-                var options = {'cert':certificate, 'key':key, 'production':production };
-
-        	var apnConnection = new apn.Connection(options);
-                var note = new apn.Notification();
-
-                note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-                if(msg.badge!=null){
-                	note.badge = msg.badge;
-                }
-                if(msg.notifitationPayload!=null){
-                	note.payload = msg.notifitationPayload;
+            var production = true;
+            if (config.hasOwnProperty('destination')) {
+                if(config.destination == 'Production'){
+                    production = true;
                 }
                 else{
-                	note.payload = {'messageFrom': 'Exentriq'};
+                    production = false;
                 }
-								if(msg.notificationTopic){
-									note.topic = msg.notificationTopic;
-								}
-                note.sound = "ping.aiff";
-                note.alert = msg.payload;
+            }
+
+            node.log("Production: " + production);
+
+            var options = {cert:certificate, key:key, production:production, rejectUnauthorized: false };
+
+        	var apnConnection = new apn.Notification(options);
+            var note = new apn.Notification();
+
+            note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+            if(msg.badge!=null){
+                note.badge = msg.badge;
+            }
+            if(msg.notifitationPayload!=null){
+                note.payload = msg.notifitationPayload;
+            }
+            else{
+                note.payload = {'messageFrom': 'Exentriq'};
+            }
+            if(msg.notificationTopic){
+                note.topic = msg.notificationTopic;
+            }
+            note.sound = "ping.aiff";
+            note.alert = msg.payload;
 
 
-                var regTokens = [];
-                if(util.isArray(msg.topic)){
-        			regTokens = msg.topic;
-        		}
-        		else{
-        			regTokens.push(msg.topic);
-        		}
-                var l = regTokens.length;
-                for (var i = 0; i < l; i++) {
-                	try {
-                		var regToken = regTokens[i];
-                    	var myDevice = new apn.Device(regToken);
-                    	apnConnection.pushNotification(note, myDevice);
-					} catch (e) {
-						node.error("Errore during notification sent", e);
-					}
-
+            var regTokens = [];
+            if(Array.isArray(msg.topic)){
+                regTokens = msg.topic;
+            }
+            else{
+                regTokens.push(msg.topic);
+            }
+            var l = regTokens.length;
+            for (var i = 0; i < l; i++) {
+                try {
+                    var regToken = regTokens[i];
+                    var cleanToken = regToken.replace(/[ <>]*/g,'');
+                    apnConnection.send(note, cleanToken)
+                        .then(r => {
+                            msg.payload = r;
+                            node.send(msg);
+                        })
+                        .catch(e => {
+                            node.error(e);
+                        });
+                } catch (e) {
+                    node.error("Errore during notification sent", e);
                 }
-                apnConnection.shutdown();
-                //node.status({});
+
+            }
+            apnConnection.shutdown();
+            //node.status({});
         	});
         }
     	catch(e){
