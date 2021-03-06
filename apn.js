@@ -41,7 +41,7 @@ module.exports = function(RED) {
 
             var options = {cert:certificate, key:key, production:production, rejectUnauthorized: false };
 
-        	var apnConnection = new apn.Notification(options);
+        	var apnConnection = new apn.Provider(options);
             var note = new apn.Notification();
 
             note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
@@ -83,6 +83,7 @@ module.exports = function(RED) {
                         });
                 } catch (e) {
                     node.error("Errore during notification sent", e);
+                    console.log(e);
                 }
 
             }
