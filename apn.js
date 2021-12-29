@@ -60,6 +60,12 @@ module.exports = function(RED) {
             note.sound = "ping.aiff";
             note.alert = msg.payload;
 
+            if(msg.notificationProperties){
+                Object.assign(note, msg.notificationProperties);
+            }
+
+            node.log("Sending notification:");
+            node.log(note);
 
             var regTokens = [];
             if(Array.isArray(msg.topic)){
