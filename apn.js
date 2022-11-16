@@ -58,6 +58,9 @@ module.exports = function(RED) {
                 note.topic = msg.notificationTopic;
             }
             note.sound = "ping.aiff";
+            if (msg.sound) {
+              note.sound = msg.sound;
+            }
             note.alert = msg.payload;
 
             if(msg.notificationProperties){
