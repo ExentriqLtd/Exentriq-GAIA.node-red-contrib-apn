@@ -57,11 +57,16 @@ module.exports = function(RED) {
             if(msg.notificationTopic){
                 note.topic = msg.notificationTopic;
             }
-            note.sound = "ping.aiff";
+            if (msg.sound !== undefined && msg.sound !== null) {
+                note.sound = msg.sound;
+            } else if (msg.sound === undefined) {
+                note.sound = "ping.aiff";
+            }
             if (msg.sound) {
               note.sound = msg.sound;
             }
-            note.alert = msg.payload;
+            if (msg.payload != null) { note.alert = msg.payload; }
+            if (msg.contentAvailable != null) { note.contentAvailable = msg.contentAvailable; }
 
             if(msg.notificationProperties){
                 Object.assign(note, msg.notificationProperties);
